@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using Unity.Robotics.ROSTCPConnector;
 using RosMessageTypes.UnityRoboticsDemo;
@@ -15,7 +14,6 @@ public class RosPublisherExample : MonoBehaviour
     public GameObject cube;
     // Publish the cube's position and rotation every N seconds
     public float publishMessageFrequency = 0.5f;
-
     // Used to determine how much time has elapsed since the last message was published
     private float timeElapsed;
 
