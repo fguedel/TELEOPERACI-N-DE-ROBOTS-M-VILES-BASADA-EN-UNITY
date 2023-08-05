@@ -6,12 +6,11 @@ using Unity.Robotics.ROSTCPConnector;
 using Unity.Robotics.ROSTCPConnector.MessageGeneration;
 using RosMessageTypes.Nav;
 
-// roslaunch ros_tcp_endpoint endpoint.launch tcp_ip:=192.168.1.34 tcp_port:=10000
-
-public class PositionSubscriber : MonoBehaviour
+public class PositionSubscriberOdom : MonoBehaviour
 {
     // Parámetros físicos.
     public GameObject robot;
+    private float rotacion;
     // Gestión de los topics.
     public string topicName = "/odom";
     // Almacén de la información del mensage de odometría al que se suscribe.
@@ -37,21 +36,15 @@ public class PositionSubscriber : MonoBehaviour
             // Al recibir la pose se establece en la del robot.
             robot.transform.position = new Vector3(
                 (float)lastOdometryMsg.pose.pose.position.x,
-                (float)lastOdometryMsg.pose.pose.position.y,
-                (float)lastOdometryMsg.pose.pose.position.z);
+                (float)lastOdometryMsg.pose.pose.position.z, // El orden de las coordenadas está invertido en Unity.
+                (float)lastOdometryMsg.pose.pose.position.y);
 
             // Al recibir la orientación en angulares se pasa a cuaternión.
-            Quaternion quatRotation = Quaternion.Euler(
-                (float)lastOdometryMsg.twist.twist.angular.x, 
-                (float)lastOdometryMsg.twist.twist.angular.y, 
-                (float)lastOdometryMsg.twist.twist.angular.z);
+            rotacion -= (float)lastOdometryMsg.twist.twist.angular.z; // El orden de las coordenadas está invertido en Unity.
+            Quaternion quatRotation = Quaternion.Euler(0, rotacion, 0);
 
             // Se establece el cuaternión en la orientación del robot.
-            robot.transform.rotation = new Quaternion(
-                quatRotation.x,
-                quatRotation.y,
-                quatRotation.z,
-                quatRotation.w);
+            robot.transform.rotation = quatRotation;
 
             // Reinicia el conteo.
             timeElapsed = 0;

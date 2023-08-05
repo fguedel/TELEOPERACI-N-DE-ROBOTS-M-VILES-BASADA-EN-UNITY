@@ -7,7 +7,7 @@ using Unity.Robotics.ROSTCPConnector;
 using Unity.Robotics.ROSTCPConnector.MessageGeneration;
 using RosMessageTypes.Geometry;
 
-// roslaunch ros_tcp_endpoint endpoint.launch tcp_ip:=192.168.1.34 tcp_port:=10000
+// roslaunch ros_tcp_endpoint endpoint.launch tcp_ip:=10.217.7.146 tcp_port:=10000
 
 // roslaunch turtlebot3_gazebo turtlebot3_empty_world.launch
 
@@ -15,7 +15,7 @@ public class XboxPublisherTwist : MonoBehaviour
 {
     // Gestor de InputSystem.
     InputMaster input;
-    Vector2 currentMov;
+    Vector3 currentMov;
     bool movementPressed;
     private void OnEnable() {input.Robot0.Enable();}
     private void OnDisable() {input.Robot0.Disable();}
@@ -39,8 +39,8 @@ public class XboxPublisherTwist : MonoBehaviour
     {
         input = new InputMaster();
         input.Robot0.Movimiento.performed += ctx => {
-            currentMov = ctx.ReadValue<Vector2>();
-            movementPressed = currentMov != Vector2.zero;
+            currentMov = ctx.ReadValue<Vector3>();
+            movementPressed = currentMov.x != 0 || currentMov.z != 0;
             };
     }
 
@@ -54,28 +54,15 @@ public class XboxPublisherTwist : MonoBehaviour
     void Update()
     {
         timeElapsed += Time.deltaTime;
-        if (timeElapsed > publishMessagePeriod && movementPressed)
+        if (timeElapsed > publishMessagePeriod)
         {
-            // Calculate linear and angular velocities based on input
-            //twistMessage = new TwistMsg();
-            //twistMessage.linear.x = new Vector3(currentMov.y * BURGER_MAX_LIN_VEL, 0, 0);
-            // Negative sign to adjust for Unity's coordinate system
-            //twistMessage.angular.z = new Vector3(0, 0, -currentMov.x * BURGER_MAX_ANG_VEL);
-
             // Generación de los arrays de posición y orientación.
             Vector3Msg linearVel = new Vector3Msg
-            {x = currentMov.y * BURGER_MAX_LIN_VEL, y = 0, z = 0};
+            {x = currentMov.z * BURGER_MAX_LIN_VEL, y = 0, z = 0};
             Vector3Msg angularVel = new Vector3Msg
             {x = 0, y = 0, z = -currentMov.x * BURGER_MAX_ANG_VEL};
             // Update the Twist message with the new velocities
             twistMessage = new TwistMsg(linearVel, angularVel); // Use 'Twist' from RosMessageTypes.Geometry
-
-            Debug.Log("lin x" + linearVel.x);
-            Debug.Log("lin y" + linearVel.y);
-            Debug.Log("lin z" + linearVel.z);
-            Debug.Log("ang x" + angularVel.x);
-            Debug.Log("ang y" + angularVel.y);
-            Debug.Log("ang z" + angularVel.z);
 
             // Publish the Twist message to the /cmd_vel to server_endpoint.py running in ROS
             ros.Publish(topicName, twistMessage);
