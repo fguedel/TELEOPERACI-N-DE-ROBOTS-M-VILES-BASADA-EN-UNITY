@@ -1015,6 +1015,56 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsBaseLink: 1
+--- !u!1 &589993664
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 589993666}
+  - component: {fileID: 589993665}
+  m_Layer: 0
+  m_Name: ModificadorColor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &589993665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 589993664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26adf9350e4662bd7bf0c70222f34ff3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colorChangeInterval: 1
+  availableColors:
+  - {r: 1, g: 0, b: 0, a: 0}
+  - {r: 1, g: 0, b: 0.9728837, a: 0}
+  - {r: 0, g: 0.083200455, b: 1, a: 0}
+  - {r: 0, g: 1, b: 0.16342616, a: 0}
+--- !u!4 &589993666
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 589993664}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &627797890
 GameObject:
   m_ObjectHideFlags: 8
@@ -2168,7 +2218,7 @@ MonoBehaviour:
   indicadorGiro: {fileID: 5295255967912395055, guid: 93772eaf8b8c3ad8c983c7582e5cb15d, type: 3}
   robot: {fileID: 1217580222}
   velGiro: 200
-  velExpansion: 5
+  velCrecer: 5
 --- !u!1 &1217580222
 GameObject:
   m_ObjectHideFlags: 0
@@ -2909,8 +2959,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   robot: {fileID: 1217580222}
-  marcaPrefab: {fileID: 8877916266050791941, guid: 663ec8877d26bfaf3a008a72e130fb25, type: 3}
-  colorGradient:
+  marcaPrefab: {fileID: 822915159222718336, guid: aca29858049a8b38b915f628fc36b491, type: 3}
+  gradienteColor:
     serializedVersion: 2
     key0: {r: 1, g: 0, b: 0, a: 1}
     key1: {r: 1, g: 1, b: 1, a: 1}
@@ -2939,9 +2989,11 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 3
     m_NumAlphaKeys: 2
+  separacionMarcas: 0.05
   topicName: /scan
   ros: {fileID: 1580577481}
   publishMessagePeriod: 0.1
+  colorChanger: {fileID: 589993665}
 --- !u!1 &1791083865
 GameObject:
   m_ObjectHideFlags: 8

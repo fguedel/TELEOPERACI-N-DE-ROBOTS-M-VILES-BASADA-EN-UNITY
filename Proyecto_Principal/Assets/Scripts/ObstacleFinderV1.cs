@@ -8,15 +8,14 @@ using Unity.Robotics.ROSTCPConnector.MessageGeneration;
 using RosMessageTypes.Sensor;
 
 // https://github.com/Unity-Technologies/ROS-TCP-Connector/blob/main/com.unity.robotics.ros-tcp-connector/Runtime/Messages/Sensor/msg/LaserScanMsg.cs
-public class ObstacleFinder2 : MonoBehaviour
+public class ObstacleFinderV1 : MonoBehaviour
 {
     // Parámetros físicos.
-    public GameObject robot;
     private int disparos; // El número de disparos que efectuará el Lidar.
     private float[,] trigon; // Valores cartesianos unitarios de todos los disparos del Lidar.
     public GameObject marcaPrefab; // El prefab del punto que será generado para mostrar un obstáculo.
-    public Gradient colorGradient;
-    // Gestión de los topics.
+    public Gradient gradienteColor;
+    // Para limitar la superposición de marcas.
     public string topicName = "/scan";
     private LaserScanMsg lastLaserScanMsg; // Almacén de la información del mensage al que se suscribe.
     [SerializeField] private ROSConnection ros;
@@ -25,6 +24,7 @@ public class ObstacleFinder2 : MonoBehaviour
     // Used to determine how much time has elapsed since the last message was published
     private float timeElapsed;
     private Color[] markerColors; // Array de colores precalculado en base a la distancia.
+
 
     void Awake()
     {
@@ -36,7 +36,7 @@ public class ObstacleFinder2 : MonoBehaviour
         for (int i = 0; i < markerColors.Length; i++)
         {
             float distNormal = i / 100f;
-            markerColors[i] = colorGradient.Evaluate(distNormal);
+            markerColors[i] = gradienteColor.Evaluate(distNormal);
         }
     }
 
@@ -46,13 +46,6 @@ public class ObstacleFinder2 : MonoBehaviour
         timeElapsed += Time.deltaTime;
         if (timeElapsed > publishMessagePeriod && lastLaserScanMsg != null)
         {
-            float anguloRadianes = 0;
-            for (int i = 0; i < disparos; i++)
-            {
-                trigon[i, 0] = (float)Math.Cos(anguloRadianes);
-                trigon[i, 1] = (float)Math.Sin(anguloRadianes);
-                anguloRadianes += lastLaserScanMsg.angle_increment;
-            }
             for (int i = 0; i < disparos; i++) // Cada uno de los disparos.
             {
                 float dist = lastLaserScanMsg.ranges[i];
@@ -73,13 +66,19 @@ public class ObstacleFinder2 : MonoBehaviour
         lastLaserScanMsg = robotScan;
         disparos = lastLaserScanMsg.ranges.Length;
         trigon = new float[disparos, 2];
+        float anguloRadianes = 0;
+        for (int i = 0; i < disparos; i++)
+        {
+            trigon[i, 0] = (float)Math.Cos(anguloRadianes);
+            trigon[i, 1] = (float)Math.Sin(anguloRadianes);
+            anguloRadianes += lastLaserScanMsg.angle_increment;
+        }
     }
 
 
     void CreaMarca(float dist, int rayo) // Genera una marca en el mapa en función de la distancia de choque y el rayo que le toque del array.
     {
-        //Vector3 posicion = robot.transform.position + new Vector3(-trigon[rayo, 1] * dist, 0, trigon[rayo, 0] * dist); // Posición cartesiana con trigonometría y distancias.
-        Vector3 posicion = robot.transform.position - new Vector3(trigon[rayo, 0] * dist, 0, trigon[rayo, 1] * dist); // Posición cartesiana con trigonometría y distancias.
+        Vector3 posicion = new Vector3(-trigon[rayo, 1] * dist, 0, trigon[rayo, 0] * dist); // Posición cartesiana con trigonometría y distancias.
         GameObject marca = Instantiate(marcaPrefab, posicion, Quaternion.identity);
 
         // Colorear la marca del color correspondiente:

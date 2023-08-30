@@ -6,6 +6,7 @@ using Unity.Robotics.ROSTCPConnector;
 using Unity.Robotics.ROSTCPConnector.MessageGeneration;
 using RosMessageTypes.Tf2;
 
+// https://github.com/Unity-Technologies/ROS-TCP-Connector/blob/main/com.unity.robotics.ros-tcp-connector/Runtime/Messages/Tf2/msg/TFMessageMsg.cs
 public class PositionSubscriberTf : MonoBehaviour
 {
     // Parámetros físicos.
@@ -53,8 +54,6 @@ public class PositionSubscriberTf : MonoBehaviour
         }
     }
 
-    // Actualizar valor de odometría.
+    // Actualizar valor de transformada.
     void MovimientoRobot(TFMessageMsg robotTransform){lastTransformMsg = robotTransform;}
-
-    // https://github.com/Unity-Technologies/ROS-TCP-Connector/blob/main/com.unity.robotics.ros-tcp-connector/Runtime/Messages/Nav/msg/OdometryMsg.cs
 }

@@ -21,7 +21,9 @@ public class ArrowVisualizator : MonoBehaviour
     public GameObject indicadorGiro;
     public GameObject robot; // Para posicionar la flecha sobre el.
     public float velGiro = 200f; // Adjust the speed of rotation here
-    public float velExpansion = 5f; // Adjust the speed of scaling here
+    public float velCrecer = 5f; // Adjust the speed of scaling here
+    Quaternion targetRotation; // Cache the target rotation
+    Vector3 originalScale; // Cache the original scale
 
     private void Awake()
     {
@@ -29,11 +31,16 @@ public class ArrowVisualizator : MonoBehaviour
         indicadorMov = Instantiate(indicadorMov, Vector3.zero, Quaternion.identity);
         indicadorGiro = Instantiate(indicadorGiro, Vector3.zero, Quaternion.identity);
 
+        originalScale = indicadorMov.transform.localScale;
+
         input = new InputMaster();
         input.Robot0.Movimiento.performed += ctx => {
             currentMov = ctx.ReadValue<Vector3>();
             movementPressed = currentMov.x != 0 || currentMov.z != 0;
             };
+
+        if (movementPressed)
+            targetRotation = Quaternion.Euler(robot.transform.rotation.eulerAngles + Vector3.up * currentMov.x * 45);
     }
 
     void Update()
@@ -48,38 +55,36 @@ public class ArrowVisualizator : MonoBehaviour
         {
             indicadorMov.SetActive(false);
             indicadorGiro.SetActive(false);
-            indicadorMov.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+            indicadorMov.transform.localScale = originalScale;
         }
     }
 
     void ActualizaFlecha()
     {
         // Posiciona la flecha sobre el robot.
-        Vector3 posActualizada = robot.transform.position;
-        posActualizada.y += (float) 1;
-        indicadorMov.transform.position = posActualizada;
-
+        Vector3 posActualizada = robot.transform.position + Vector3.up * 1;
         // Orienta la flecha según el robot y si se ordena giro la rota ligeramente.
         Vector3 rotActualizada = robot.transform.rotation.eulerAngles;
         rotActualizada.y += currentMov.x*45;
-        // Rotación gradual del objeto hacia la última dirección.
-        indicadorMov.transform.rotation = Quaternion.RotateTowards(indicadorMov.transform.rotation, Quaternion.Euler(rotActualizada), Time.deltaTime * velGiro);
-
         // Cuando se ordene avanzar, la flecha se estirará en la dirección deseada.
         float targetScale = currentMov.z; // Target scale.
+
+        // Posicionamiento inmediato sobre el robot.
+        indicadorMov.transform.position = posActualizada;
+        // Rotación gradual del objeto hacia la última dirección.
+        indicadorMov.transform.rotation = Quaternion.RotateTowards(indicadorMov.transform.rotation, Quaternion.Euler(rotActualizada), Time.deltaTime * velGiro);
         // Escalado gradual del objeto en la coordenada Z hasta el valor máximo.
-        indicadorMov.transform.localScale = Vector3.Lerp(indicadorMov.transform.localScale, new Vector3(0.2f, 0.2f, targetScale + 0.2f), Time.deltaTime * velExpansion);
+        indicadorMov.transform.localScale = Vector3.Lerp(indicadorMov.transform.localScale, new Vector3(targetScale + 0.2f, 0.2f, 0.2f), Time.deltaTime * velCrecer);
     }
 
     void IndicaRotacion()
     {
         // Posiciona las flechas rotatorias sobre el robot.
-        Vector3 posActualizada = robot.transform.position;
-        posActualizada.y += (float) 0.7;
+        Vector3 posActualizada = robot.transform.position + Vector3.up * 0.7f;
         indicadorGiro.transform.position = posActualizada;
 
         // Si se ha pulsado giro (se considera +-0.1 como ruido), el disco rota en ese sentido.
-        if(currentMov.x > 0.1 || currentMov.x < -0.1)
+        if(Mathf.Abs(currentMov.x) > 0.1f)
         {
             indicadorGiro.SetActive(true);
             // Rotación gradual del indicador de giro.
