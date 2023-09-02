@@ -25,6 +25,9 @@ public class ArrowVisualizator : MonoBehaviour
     Quaternion targetRotation; // Cache the target rotation
     Vector3 originalScale; // Cache the original scale
 
+    // Generador de puntos.
+    public GameObject generadorPuntos;
+
     private void Awake()
     {
         // Sustituye el GameObject por las instancias de los indicadores.
@@ -89,8 +92,14 @@ public class ArrowVisualizator : MonoBehaviour
             indicadorGiro.SetActive(true);
             // Rotación gradual del indicador de giro.
             indicadorGiro.transform.Rotate(Vector3.up, Time.deltaTime * velGiro * currentMov.x);
+
+            generadorPuntos.SetActive(false); // Desactiva la generación de puntos cuando se gira.
         }
         else
+        {
             indicadorGiro.SetActive(false);
+
+            generadorPuntos.SetActive(true); // Reactiva la generación de puntos cuando NO se gira.
+        }
     }
 }

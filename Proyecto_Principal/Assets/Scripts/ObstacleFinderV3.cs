@@ -18,7 +18,6 @@ public class ObstacleFinderV3 : MonoBehaviour
     private int disparos; // El número de disparos que efectuará el Lidar.
     private float[,] trigon; // Valores cartesianos unitarios de todos los disparos del Lidar.
     public GameObject marcaPrefab; // El prefab del punto que será generado para mostrar un obstáculo.
-    public Gradient gradienteColor;
     // Para limitar la superposición de marcas.
     private HashSet<Vector3> posicionesMarcas = new HashSet<Vector3>(); // Almacén de posiciones de las marcas creadas.
     public float separacionMarcas = 0.1f; // Distancia mínima tolerada entre las marcas.
@@ -31,7 +30,9 @@ public class ObstacleFinderV3 : MonoBehaviour
     [SerializeField] private ROSConnection ros;
     public float publishMessagePeriod = 0.1f; // Publicación del topic cada publishMessagePeriod segundos.
     private float timeElapsed; // Se usa para llevar un conteo del tiempo transcurrido.
-    private Color[] markerColors; // Array de colores precalculado en base a la distancia.
+
+    // Transmisión de información al manejador del cambio de color.
+    public ColorDistance colorChanger;
 
     
     void Awake()
@@ -39,24 +40,18 @@ public class ObstacleFinderV3 : MonoBehaviour
         ros = ROSConnection.GetOrCreateInstance();
         ros.Subscribe<LaserScanMsg>(topicName, LIDARRobot);
         ros.Subscribe<TFMessageMsg>(topicNameTransform, MovimientoRobot);
-
-        // Colores precalculados en el gradiente.
-        markerColors = new Color[100]; // Por ejemplo un rango entre 0 y 100.
-        for (int i = 0; i < markerColors.Length; i++)
-        {
-            float distNormal = i / 100f;
-            markerColors[i] = gradienteColor.Evaluate(distNormal);
-        }
     }
 
-    // Actualizar la posición del cubo.
     void LateUpdate()
     {
         timeElapsed += Time.deltaTime;
         if (timeElapsed > publishMessagePeriod && lastLaserScanMsg != null)
         {
+            float[] disparos = lastLaserScanMsg.ranges; // Array de distancias producido por le lidar.
+            float incrementoAngular = lastLaserScanMsg.angle_increment; // Ángulo entre disparos del Lidar.
             // El ángulo de partida es la orientación del robot.
             var rosQuaternion = lastTransformMsg.transforms[0].transform;
+
             Quaternion unityQuaternion = new Quaternion(
                 (float)rosQuaternion.rotation.x,
                 (float)rosQuaternion.rotation.z,
@@ -64,18 +59,16 @@ public class ObstacleFinderV3 : MonoBehaviour
                 (float)rosQuaternion.rotation.w);
             float anguloRadianes = unityQuaternion.eulerAngles.y * Mathf.Deg2Rad; // Paso a radianes.
 
-            for (int i = 0; i < disparos; i++)
+            foreach (float distancia in disparos) // Para cada uno de los disparos...
             {
-                trigon[i, 0] = (float)Math.Cos(anguloRadianes);
-                trigon[i, 1] = (float)Math.Sin(anguloRadianes);
-                anguloRadianes += lastLaserScanMsg.angle_increment;
-            }
-
-            for (int i = 0; i < disparos; i++) // Cada uno de los disparos.
-            {
-                float dist = lastLaserScanMsg.ranges[i];
-                if (!float.IsInfinity(dist)) // Se filtran las distancias que sean infinitas.
-                    CreaMarca(dist, i);
+                if (!float.IsInfinity(distancia)) // Se filtran las distancias que sean infinitas.
+                {
+                    float xUnit = (float)Math.Cos(anguloRadianes);
+                    float yUnit = (float)Math.Sin(anguloRadianes);
+                    Vector3 posicionMarca = robot.transform.position + new Vector3(xUnit * distancia, 0, yUnit * distancia); // Posición cartesiana.
+                    CreaMarca(posicionMarca);
+                }
+                anguloRadianes += incrementoAngular;
             }
             timeElapsed = 0; // Reinicia el conteo hasta el siguiente tick.
         }
@@ -86,8 +79,7 @@ public class ObstacleFinderV3 : MonoBehaviour
     void LIDARRobot(LaserScanMsg robotScan)
     {
         lastLaserScanMsg = robotScan;
-        disparos = lastLaserScanMsg.ranges.Length;
-        trigon = new float[disparos, 2];
+        colorChanger.constructor(lastLaserScanMsg.range_max, lastLaserScanMsg.range_min); // Indica al coloreador de marcas las distancias extremas.
     }
 
 
@@ -96,29 +88,18 @@ public class ObstacleFinderV3 : MonoBehaviour
 
 
     // Instancia una nueva marca de obstáculo en el mapa.
-    void CreaMarca(float dist, int rayo) // Genera una marca en el mapa en función de la distancia de choque y el rayo que le toque del array.
+    void CreaMarca(Vector3 posicion) // Genera una marca en el mapa en función de la distancia de choque y el rayo que le toque del array.
     {
-        Vector3 posicion = robot.transform.position + new Vector3(trigon[rayo, 0] * dist, 0, trigon[rayo, 1] * dist); // Posición cartesiana con trigonometría y distancias.
-        
-        if (!hayMarcaCerca(posicion))
+        if (!hayMarcaCerca(posicion)) // No pondrá una nueva marca en caso de haber otra cerca.
         {
             GameObject marca = Instantiate(marcaPrefab, posicion, Quaternion.identity);
             posicionesMarcas.Add(posicion); // Añadir la posición de la nueva marca a la lista de marcas.
-
-            // Colorear la marca del color correspondiente:
-            // Calcula la distancia y la normaliza entre 0 y 1.
-            float distNormal = Mathf.Clamp01(dist / (lastLaserScanMsg.range_max - lastLaserScanMsg.range_min));
-            // En función de la distancia indica el índice del tono de color que debe buscar en el array.
-            int colorIndex = Mathf.FloorToInt(distNormal * (markerColors.Length - 1));
-            Renderer renderer;
-            if (marca.TryGetComponent(out renderer))
-            {
-                renderer.material.color = markerColors[colorIndex]; // Establece el tono que le corresponde según el índice.
-            }
+            colorChanger.nuevaMarcaCreada(marca); // Indica al coloreador de marcas una nueva marca creada.
         }
     }
 
 
+    // Comprueba que no haya otras marcas cerca de la marca indicada.
     bool hayMarcaCerca(Vector3 nuevaMarca)
     {
         // Revisará todos los macadores para comprobar que no estén demqasiado cerca.
