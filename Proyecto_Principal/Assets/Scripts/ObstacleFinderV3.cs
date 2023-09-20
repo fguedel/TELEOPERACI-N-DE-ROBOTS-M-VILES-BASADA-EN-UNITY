@@ -47,17 +47,15 @@ public class ObstacleFinderV3 : MonoBehaviour
         timeElapsed += Time.deltaTime;
         if (timeElapsed > publishMessagePeriod && lastLaserScanMsg != null)
         {
-            float[] disparos = lastLaserScanMsg.ranges; // Array de distancias producido por le lidar.
+            float[] disparos = lastLaserScanMsg.ranges; // Array de distancias producido por el Lidar.
             float incrementoAngular = lastLaserScanMsg.angle_increment; // Ángulo entre disparos del Lidar.
             // El ángulo de partida es la orientación del robot.
             var rosQuaternion = lastTransformMsg.transforms[0].transform;
-
             Quaternion unityQuaternion = new Quaternion(
                 (float)rosQuaternion.rotation.x,
                 (float)rosQuaternion.rotation.z,
                 (float)rosQuaternion.rotation.y,
                 (float)rosQuaternion.rotation.w);
-                
             float anguloRadianes = unityQuaternion.eulerAngles.y * Mathf.Deg2Rad; // Paso a radianes.
 
             foreach (float distancia in disparos) // Para cada uno de los disparos...
@@ -76,7 +74,7 @@ public class ObstacleFinderV3 : MonoBehaviour
     }
 
 
-    // Actualizar valor del Lidar
+    // Actualizar valores del Lidar.
     void LIDARRobot(LaserScanMsg robotScan)
     {
         lastLaserScanMsg = robotScan;

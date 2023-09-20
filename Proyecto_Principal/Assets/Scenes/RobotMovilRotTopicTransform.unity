@@ -1716,8 +1716,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a15534c0d30c054fdb11fd06122a6bf6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  indicadorMov: {fileID: 3426086476367155769, guid: 7d575fd31ddf62f559590354c7ca7423, type: 3}
-  indicadorGiro: {fileID: 5295255967912395055, guid: 93772eaf8b8c3ad8c983c7582e5cb15d, type: 3}
+  indicadorMov: {fileID: 6015362929766072841, guid: 7d575fd31ddf62f559590354c7ca7423, type: 3}
+  indicadorGiro: {fileID: 690951975314756955, guid: 93772eaf8b8c3ad8c983c7582e5cb15d, type: 3}
   robot: {fileID: 953232717}
   velGiro: 200
   velCrecer: 5
@@ -2457,7 +2457,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   robot: {fileID: 953232717}
   marcaPrefab: {fileID: 822915159222718336, guid: aca29858049a8b38b915f628fc36b491, type: 3}
-  separacionMarcas: 0.1
+  separacionMarcas: 0.05
   topicName: /scan
   topicNameTransform: /tf
   ros: {fileID: 1580577481}
