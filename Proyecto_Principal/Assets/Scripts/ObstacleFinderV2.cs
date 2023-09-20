@@ -61,6 +61,35 @@ public class ObstacleFinderV2 : MonoBehaviour
     }
 
 
+    void LateUpdateDos()
+    {
+        timeElapsed += Time.deltaTime;
+        if (timeElapsed > publishMessagePeriod && lastLaserScanMsg != null)
+        {
+            float[] disparos = lastLaserScanMsg.ranges; // Array de distancias producido por el Lidar.
+            float incrementoAngular = lastLaserScanMsg.angle_increment; // Ángulo entre disparos del Lidar.
+            Quaternion localRotation = robot.transform.rotation;
+            Vector3 worldDirection = transform.TransformDirection(localRotation * Vector3.forward);
+            float anguloRadianes = -robot.transform.rotation.eulerAngles.y * Mathf.Deg2Rad; // Paso a radianes de la orientación inicial.
+            //float anguloRadianes = worldDirection.y * Mathf.Deg2Rad; // Paso a radianes de la orientación inicial.
+            //float anguloRadianes = worldDirection.y * Mathf.Deg2Rad - robot.transform.rotation.eulerAngles.y * Mathf.Deg2Rad; // Paso a radianes de la orientación inicial.
+            
+            foreach (float distancia in disparos) // Para cada uno de los disparos...
+            {
+                if (!float.IsInfinity(distancia)) // Se filtran las distancias que sean infinitas.
+                {
+                    float xUnit = (float)Math.Cos(anguloRadianes);
+                    float yUnit = (float)Math.Sin(anguloRadianes);
+                    Vector3 posicionMarca = robot.transform.position + new Vector3(xUnit * distancia, 0, yUnit * distancia); // Posición cartesiana.
+                    CreaMarca(posicionMarca);
+                }
+                anguloRadianes += incrementoAngular;
+            }
+            timeElapsed = 0; // Reinicia el conteo hasta el siguiente tick.
+        }
+    }
+
+
     // Actualizar valores del Lidar.
     void LIDARRobot(LaserScanMsg robotScan)
     {

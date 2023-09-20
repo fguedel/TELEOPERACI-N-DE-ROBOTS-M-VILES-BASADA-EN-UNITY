@@ -43,7 +43,7 @@ public class PositionSubscriberTf : MonoBehaviour
                 (float)transformStamped.translation.y);
             
             // Al recibir la orientación en QuaternionMsg se establece en la orientación del robot como Quaternion.
-            robot.transform.rotation = new Quaternion(
+            robot.transform.rotation = Quaternion.Euler(0, 90, 0) * new Quaternion(
                 (float)transformStamped.rotation.x,
                 -(float)transformStamped.rotation.z,
                 (float)transformStamped.rotation.y,

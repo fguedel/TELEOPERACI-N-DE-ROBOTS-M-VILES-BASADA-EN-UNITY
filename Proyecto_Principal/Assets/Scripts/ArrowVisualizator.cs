@@ -77,7 +77,7 @@ public class ArrowVisualizator : MonoBehaviour
         // Rotación gradual del objeto hacia la última dirección.
         indicadorMov.transform.rotation = Quaternion.RotateTowards(indicadorMov.transform.rotation, Quaternion.Euler(rotActualizada), Time.deltaTime * velGiro);
         // Escalado gradual del objeto en la coordenada Z hasta el valor máximo.
-        indicadorMov.transform.localScale = Vector3.Lerp(indicadorMov.transform.localScale, new Vector3(targetScale + 0.2f, 0.2f, 0.2f), Time.deltaTime * velCrecer);
+        indicadorMov.transform.localScale = Vector3.Lerp(indicadorMov.transform.localScale, new Vector3(0.2f, 0.2f, targetScale + 0.2f), Time.deltaTime * velCrecer);
     }
 
     void IndicaRotacion()
@@ -92,14 +92,10 @@ public class ArrowVisualizator : MonoBehaviour
             indicadorGiro.SetActive(true);
             // Rotación gradual del indicador de giro.
             indicadorGiro.transform.Rotate(Vector3.up, Time.deltaTime * velGiro * currentMov.x);
-
-            generadorPuntos.SetActive(false); // Desactiva la generación de puntos cuando se gira.
         }
         else
         {
             indicadorGiro.SetActive(false);
-
-            generadorPuntos.SetActive(true); // Reactiva la generación de puntos cuando NO se gira.
         }
     }
 }

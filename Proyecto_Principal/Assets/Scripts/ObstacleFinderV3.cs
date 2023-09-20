@@ -57,6 +57,7 @@ public class ObstacleFinderV3 : MonoBehaviour
                 (float)rosQuaternion.rotation.z,
                 (float)rosQuaternion.rotation.y,
                 (float)rosQuaternion.rotation.w);
+                
             float anguloRadianes = unityQuaternion.eulerAngles.y * Mathf.Deg2Rad; // Paso a radianes.
 
             foreach (float distancia in disparos) // Para cada uno de los disparos...

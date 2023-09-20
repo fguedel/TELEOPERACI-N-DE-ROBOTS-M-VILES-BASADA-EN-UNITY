@@ -13,6 +13,8 @@ using RosMessageTypes.Geometry;
 
 public class XboxPublisherTwist : MonoBehaviour
 {
+    private float MITIGADOR = 0.5F;
+
     // Gestor de InputSystem.
     InputMaster input;
     Vector3 currentMov;
@@ -60,7 +62,7 @@ public class XboxPublisherTwist : MonoBehaviour
             Vector3Msg linearVel = new Vector3Msg
             {x = currentMov.z * BURGER_MAX_LIN_VEL, y = 0, z = 0};
             Vector3Msg angularVel = new Vector3Msg
-            {x = 0, y = 0, z = -currentMov.x * BURGER_MAX_ANG_VEL};
+            {x = 0, y = 0, z = -currentMov.x * BURGER_MAX_ANG_VEL * MITIGADOR};
             // Update the Twist message with the new velocities
             twistMessage = new TwistMsg(linearVel, angularVel); // Use 'Twist' from RosMessageTypes.Geometry
 
