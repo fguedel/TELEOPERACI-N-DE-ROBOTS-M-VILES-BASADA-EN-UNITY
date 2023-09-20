@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq; // Para seleccionar componentes específicos de listas.
 
 public class ColorDistance : MonoBehaviour
 {
@@ -42,6 +43,14 @@ public class ColorDistance : MonoBehaviour
 
     // Método que permite a componentes externos rellenar de objetos marca la lista de marcas.
     public void nuevaMarcaCreada(GameObject marcaNueva) {marcasCreadas.Add(marcaNueva);}
+
+
+    // Método que de vuelve una lista de Vector3 con las posiciones de las marcas.
+    public List<Vector3> posicionesMarcas()
+    {
+        // LINQ selecciona y devuelve las posiciones directamente.
+        return marcasCreadas.Select(marca => marca.transform.position).ToList();
+    }
 
 
     private void ChangeColors()

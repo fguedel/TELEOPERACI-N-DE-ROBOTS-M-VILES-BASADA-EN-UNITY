@@ -31,8 +31,8 @@ public class ObstacleFinderV1 : MonoBehaviour
         ros = ROSConnection.GetOrCreateInstance();
         ros.Subscribe<LaserScanMsg>(topicName, LIDARRobot);
 
-        // Pre-calculate marker colors based on gradient
-        markerColors = new Color[100]; // Assuming a range_max of 100
+        // Array de marcadores de color precalculados basados en un gradiente.
+        markerColors = new Color[100]; // Por ejemplo un rango de 100 gradientes.
         for (int i = 0; i < markerColors.Length; i++)
         {
             float distNormal = i / 100f;
@@ -66,12 +66,12 @@ public class ObstacleFinderV1 : MonoBehaviour
         lastLaserScanMsg = robotScan;
         disparos = lastLaserScanMsg.ranges.Length;
         trigon = new float[disparos, 2];
-        float anguloRadianes = 0;
+        float anguloDisparo = 0;
         for (int i = 0; i < disparos; i++)
         {
-            trigon[i, 0] = (float)Math.Cos(anguloRadianes);
-            trigon[i, 1] = (float)Math.Sin(anguloRadianes);
-            anguloRadianes += lastLaserScanMsg.angle_increment;
+            trigon[i, 0] = (float)Math.Cos(anguloDisparo);
+            trigon[i, 1] = (float)Math.Sin(anguloDisparo);
+            anguloDisparo += lastLaserScanMsg.angle_increment;
         }
     }
 

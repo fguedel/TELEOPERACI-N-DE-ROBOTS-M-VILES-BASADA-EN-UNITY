@@ -77,7 +77,7 @@ public class ArrowVisualizator : MonoBehaviour
         // Rotación gradual del objeto hacia la última dirección.
         indicadorMov.transform.rotation = Quaternion.RotateTowards(indicadorMov.transform.rotation, Quaternion.Euler(rotActualizada), Time.deltaTime * velGiro);
         // Escalado gradual del objeto en la coordenada Z hasta el valor máximo.
-        indicadorMov.transform.localScale = Vector3.Lerp(indicadorMov.transform.localScale, new Vector3(0.2f, 0.2f, targetScale + 0.2f), Time.deltaTime * velCrecer);
+        indicadorMov.transform.localScale = Vector3.Lerp(indicadorMov.transform.localScale, new Vector3(targetScale + 0.2f, 0.2f, 0.2f), Time.deltaTime * velCrecer);
     }
 
     void IndicaRotacion()
