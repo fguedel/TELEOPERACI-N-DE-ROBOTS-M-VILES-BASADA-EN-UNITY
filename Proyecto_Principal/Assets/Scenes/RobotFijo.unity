@@ -2337,7 +2337,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba9d1f724aebbbf8294906e2e0928cd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MITIGADOR: 0.1
+  MITIGADOR: 0.3
   topicName: /cmd_vel
   ros: {fileID: 549934143}
   publishMessagePeriod: 0.1
