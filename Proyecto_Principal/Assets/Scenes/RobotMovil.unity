@@ -2200,7 +2200,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7acef0b79454c9b4dae3f8139bc4ba77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_RosIPAddress: 192.168.1.128
+  m_RosIPAddress: 192.168.1.131
   m_RosPort: 10000
   m_ConnectOnStart: 1
   m_KeepaliveTime: 1
@@ -2208,7 +2208,7 @@ MonoBehaviour:
   m_SleepTimeSeconds: 0.01
   m_ShowHUD: 1
   m_TFTopics: []
-  listenForTFMessages: 1
+  listenForTFMessages: 0
 --- !u!4 &1580577482
 Transform:
   m_ObjectHideFlags: 0
@@ -2780,6 +2780,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba9d1f724aebbbf8294906e2e0928cd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MITIGADOR: 0.1
   topicName: /cmd_vel
   ros: {fileID: 1580577481}
   publishMessagePeriod: 0.1

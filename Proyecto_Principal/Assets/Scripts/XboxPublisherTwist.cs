@@ -13,7 +13,7 @@ using RosMessageTypes.Geometry;
 
 public class XboxPublisherTwist : MonoBehaviour
 {
-    private float MITIGADOR = 0.5F;
+    public float MITIGADOR = 0.5F;
 
     // Gestor de InputSystem.
     InputMaster input;
@@ -23,7 +23,7 @@ public class XboxPublisherTwist : MonoBehaviour
     private void OnDisable() {input.Robot0.Disable();}
 
     // Parámetros físicos.
-    float BURGER_MAX_LIN_VEL = 0.22F;
+    float BURGER_MAX_LIN_VEL = 1F;//0.22F;
     float BURGER_MAX_ANG_VEL = 2.84F;
 
     // Gestión de los topics.
@@ -60,7 +60,8 @@ public class XboxPublisherTwist : MonoBehaviour
         {
             // Generación de los arrays de posición y orientación.
             Vector3Msg linearVel = new Vector3Msg
-            {x = currentMov.z * BURGER_MAX_LIN_VEL, y = 0, z = 0};
+            {x = currentMov.z * BURGER_MAX_LIN_VEL * MITIGADOR, y = 0, z = 0};
+            Debug.Log(linearVel);
             Vector3Msg angularVel = new Vector3Msg
             {x = 0, y = 0, z = -currentMov.x * BURGER_MAX_ANG_VEL * MITIGADOR};
             // Update the Twist message with the new velocities
@@ -72,5 +73,6 @@ public class XboxPublisherTwist : MonoBehaviour
             // Reinicia el conteo.
             timeElapsed = 0;
         }
+        
     }
 }
